@@ -1,6 +1,6 @@
 use std::{
     fs::File,
-    io::{self, Read},
+    io::{self, stdin, stdout, Read, Write},
 };
 
 use crate::gen_pass::{self, Mode};
@@ -51,6 +51,10 @@ pub struct Cli {
     #[clap(long, default_value_t = false)]
     /// Enable chain mode: generates a longer password by concatenating results from multiple loops.
     pub chain: bool,
+
+    /// input your commnads and options via prompt to cover your actions.
+    #[clap(short, long, default_value_t = false)]
+    input: bool,
 }
 
 /// Helper enum to distinguish input sources for reading.
@@ -91,7 +95,33 @@ pub fn read_source_to_string(source: InputSource, source_name: &str) -> String {
 /// Parses command-line arguments, handles input from various sources (argument, file, stdin),
 /// generates shell completions if requested, and then generates and prints the password.
 pub fn run() {
-    let cli = Cli::parse();
+    let mut cli = Cli::parse();
+
+    if cli.input {
+        eprint!("> ");
+        let _ = stdout().flush();
+        let mut input = String::new();
+        let _ = stdin().read_line(&mut input);
+        let input = input.trim();
+
+        let commands = match shell_words::split(input) {
+            Ok(mut v) => {
+                v.insert(0, "fpas".to_string());
+                v
+            }
+            Err(_) => Vec::new(),
+        };
+
+        match Cli::try_parse_from(commands) {
+            Ok(v) => {
+                cli = v;
+            }
+            Err(err) => {
+                println!("{}", err);
+                return;
+            }
+        }
+    }
 
     // Handle shell completion generation if requested.
     if let Some(shell) = cli.completions {

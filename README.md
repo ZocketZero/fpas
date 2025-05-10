@@ -37,6 +37,23 @@ to generate long password
 fpas --chain -l 10 your_text
 ```
 
+---
+
+
+#### Use `-i` or `--input` to cover your key
+
+let consider this command `7z a zipfile folder -p$(fpas 'your_key')`: after you'd enter the command, your shell will keep all commands and options in history (use `history` command to print history) which increases security risks.
+
+To solve this problem simply use `-i`.
+
+```bash
+fpas -i
+> your_key
+&9@a7df@5977b5b009b3@06#054c7f7@3363b##0c...
+```
+
+after you have seen `>` just enter the commands and options which you prefer. Then just press `enter` on your keyboard.
+
 ## Use cases
 
 You might want to create a compressed file with a password. To ensure the strongest security, you need to use a very long password that includes a variety of characters.
