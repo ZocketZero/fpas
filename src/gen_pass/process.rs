@@ -1,7 +1,7 @@
 use clap::ValueEnum;
 
 use super::{byte_mode, chain_mode, normal_mode};
-#[derive(Clone, Debug, Default, ValueEnum)]
+#[derive(Clone, Debug, Default, ValueEnum, PartialEq)]
 pub enum Mode {
     #[default]
     N,

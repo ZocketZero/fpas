@@ -26,42 +26,43 @@ const EXAMPLE_COMMANDS: &str = r#"Examples:
     long_about = None, // Uses `about` for long description as well
     after_help = EXAMPLE_COMMANDS // Appends examples to the help message
 )]
-struct Cli {
+pub struct Cli {
     /// Input string to use for password generation.
     /// If not provided, and --file is not used, reads from stdin.
-    msg: Option<String>,
+    pub msg: Option<String>,
 
     #[clap(short = 'f', long = "file", value_name = "file")]
     /// Path to a file containing the input string for password generation.
-    file: Option<String>,
+    pub file: Option<String>,
 
     #[clap(short, long, default_value_t, value_enum)]
     /// Password generation mode (e.g., character set).
-    mode: Mode,
+    pub mode: Mode,
 
     #[clap(long, short)]
     /// Generate shell completion scripts for the specified shell.
-    completions: Option<Shell>,
+    pub completions: Option<Shell>,
 
     #[clap(short = 'l', long = "loop", value_name = "COUNT")]
     /// Number of iterations for the generation algorithm.
     /// If chain mode is enabled, this determines the number of segments concatenated.
-    loop_count: Option<u32>,
+    pub loop_count: Option<u32>,
 
     #[clap(long, default_value_t = false)]
     /// Enable chain mode: generates a longer password by concatenating results from multiple loops.
-    chain: bool,
+    pub chain: bool,
 }
 
 /// Helper enum to distinguish input sources for reading.
-enum InputSource<'a> {
+#[derive(Debug)]
+pub enum InputSource<'a> {
     File(File),
     Stdin(io::StdinLock<'a>),
 }
 
 /// Reads data from the given source and attempts to convert it to a UTF-8 string.
 /// Exits the program with an error message if reading or UTF-8 conversion fails.
-fn read_source_to_string(source: InputSource, source_name: &str) -> String {
+pub fn read_source_to_string(source: InputSource, source_name: &str) -> String {
     let mut buffer = Vec::new();
     let read_result = match source {
         InputSource::File(mut f) => f.read_to_end(&mut buffer),
@@ -76,7 +77,10 @@ fn read_source_to_string(source: InputSource, source_name: &str) -> String {
     match String::from_utf8(buffer) {
         Ok(s) => s,
         Err(e) => {
-            eprintln!("Error: Input from {} is not valid UTF-8: {}", source_name, e);
+            eprintln!(
+                "Error: Input from {} is not valid UTF-8: {}",
+                source_name, e
+            );
             std::process::exit(1);
         }
     }
