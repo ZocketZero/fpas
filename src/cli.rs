@@ -78,16 +78,8 @@ pub fn read_source_to_string(source: InputSource, source_name: &str) -> String {
         std::process::exit(1);
     }
 
-    match String::from_utf8(buffer) {
-        Ok(s) => s,
-        Err(e) => {
-            eprintln!(
-                "Error: Input from {} is not valid UTF-8: {}",
-                source_name, e
-            );
-            std::process::exit(1);
-        }
-    }
+    let msg = buffer.iter().map(|f| *f as char).collect::<Vec<char>>();
+    String::from_iter(msg)
 }
 
 /// Runs the fpas CLI application logic.
