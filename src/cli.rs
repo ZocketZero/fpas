@@ -55,6 +55,9 @@ pub struct Cli {
     /// input your commnads and options via prompt to cover your actions.
     #[clap(short, long, default_value_t = false)]
     input: bool,
+    /// print license
+    #[clap(long, default_value_t = false)]
+    license: bool,
 }
 
 /// Helper enum to distinguish input sources for reading.
@@ -88,6 +91,12 @@ pub fn read_source_to_string(source: InputSource, source_name: &str) -> String {
 /// generates shell completions if requested, and then generates and prints the password.
 pub fn run() {
     let mut cli = Cli::parse();
+
+    if cli.license {
+        let license = include_str!("../LICENSE");
+        print!("{}", license);
+        return;
+    }
 
     if cli.input {
         eprint!("> ");
