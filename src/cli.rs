@@ -3,7 +3,10 @@ use std::{
     io::{self, stdin, stdout, Read, Write},
 };
 
-use crate::gen_pass::{self, Mode};
+use crate::{
+    gen_pass::{self, Mode},
+    output,
+};
 use clap::{command, CommandFactory, Parser};
 use clap_complete::{generate, Shell};
 
@@ -30,6 +33,10 @@ pub struct Cli {
     /// Input string to use for password generation.
     /// If not provided, and --file is not used, reads from stdin.
     pub msg: Option<String>,
+
+    /// declare output len
+    #[clap(long)]
+    pub len: Option<u8>,
 
     #[clap(short = 'f', long = "file", value_name = "file")]
     /// Path to a file containing the input string for password generation.
@@ -156,6 +163,5 @@ pub fn run() {
     // Generate the password.
     let passwd = gen_pass::process(input_data, cli.mode, iterations, cli.chain);
 
-    // Print the generated password to stdout.
-    print!("{}", passwd);
+    output::print_passwd(&passwd, cli.len);
 }
