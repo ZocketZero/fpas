@@ -1,14 +1,20 @@
 name: CD
 
+permissions:
+  contents: write
+
+# Trigger the workflow on push to tags matching the pattern vX.Y.Z
+# where X, Y, and Z are numbers (e.g., v1.0.0)
 on:
   push:
-    branches:
-      - main
+    tags:
+      - v[0-9]+.*
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  # Release to crates.io
   release:
     runs-on: ubuntu-latest
     steps:
@@ -21,3 +27,45 @@ jobs:
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
         run: cargo publish
+
+  # from https://github.com/marketplace/actions/build-and-upload-rust-binary-to-github-releases
+  # Create GitHub Release
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: taiki-e/create-gh-release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  # Build and upload assets (Binary) to GitHub Release
+  upload-assets:
+    needs: create-release
+    strategy:
+      matrix:
+        include:
+          # Linux x86_64
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+          # Linux Arrch64
+          - target: aarch64-unknown-linux-gnu
+            os: ubuntu-latest
+          # Linux Arm7
+          - target: armv7-unknown-linux-gnueabihf
+            os: ubuntu-latest
+          # Apple x86_64
+          - target: x86_64-apple-darwin
+            os: macos-latest
+          # Windows x86_64
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: taiki-e/upload-rust-binary-action@v1
+        with:
+          bin: tenjin
+          target: ${{ matrix.target }}
+          tar: unix
+          zip: windows
+          token: ${{ secrets.GITHUB_TOKEN }}
