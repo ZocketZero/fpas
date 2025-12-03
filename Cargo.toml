@@ -1,23 +1,23 @@
 [package]
 name = "fpas"
 description = "fpas is command line software helps you create password from some text"
-version = "0.5.2"
+version = "0.5.3"
 authors = ["Nawasan <nawasan.dev@gmail.com>"]
 license = "MIT"
 edition = "2021"
-repository = "https://github.com/Arikato111/fpas"
+repository = "https://github.com/ZocketZero/fpas"
 categories = ["command-line-utilities"]
 
 include = ["src/", "LICENSE"]
 
 [dependencies]
 base64 = "0.22.1"
-clap = { version = "4.5.13", features = ["derive"] }
-clap_complete = { version = "4.5.23" }
+clap = { version = "4.5.53", features = ["derive"] }
+clap_complete = { version = "4.5.61" }
 md5 = "0.7.0"
 sha1 = "0.10.6"
-sha256 = "1.5.0"
+sha256 = "1.6.0"
 shell-words = "1.1.0"
 
 [dev-dependencies]
-tempfile = "3.19.1"
+tempfile = "3.23.0"
